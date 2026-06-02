@@ -14,8 +14,6 @@ namespace InputGlyphs.Display
 {
     public class InputGlyphText : MonoBehaviour
     {
-        public static int PackedTextureSize = 2048;
-
         [SerializeField]
         public TMP_Text Text = null;
 
@@ -192,29 +190,34 @@ namespace InputGlyphs.Display
                     Debug.LogWarning("InputActionReference is not set.", this);
                     return;
                 }
+                
+                Texture2D texture;
+                var textureIndex = assignedTextureCount;
+                if (textureIndex < _actionTextureBuffer.Count)
+                {
+                    texture = _actionTextureBuffer[textureIndex];
+                }
+                else
+                {
+                    texture = new Texture2D(2, 2);
+                    _actionTextureBuffer.Add(texture);
+                }
 
+                var hasGeneratedGlyphTexture = false;
                 var playerInputAction = playerInput.actions.FindAction(actionReference.action.id);
                 if (InputLayoutPathUtility.TryGetActionBindingPath(playerInputAction, PlayerInput.currentControlScheme, _pathBuffer))
                 {
-                    Texture2D texture;
-                    var textureIndex = assignedTextureCount;
-                    if (textureIndex < _actionTextureBuffer.Count)
-                    {
-                        texture = _actionTextureBuffer[textureIndex];
-                    }
-                    else
-                    {
-                        texture = new Texture2D(2, 2);
-                        _actionTextureBuffer.Add(texture);
-                    }
-                    
-                    if (DisplayGlyphTextureGenerator.GenerateGlyphTexture(texture, devices, _pathBuffer, GlyphsLayoutData))
-                    {
-                        _actionTextureIndexes.Add(Tuple.Create(playerInputAction.name, textureIndex));
-                    }
-                    
-                    assignedTextureCount++;
+                    hasGeneratedGlyphTexture = DisplayGlyphTextureGenerator.GenerateGlyphTexture(texture, devices, _pathBuffer, GlyphsLayoutData);
                 }
+
+                // fallback
+                if (!hasGeneratedGlyphTexture)
+                {
+                    texture.Reinitialize(8, 8);
+                }
+                
+                _actionTextureIndexes.Add(Tuple.Create(playerInputAction.name, textureIndex));
+                assignedTextureCount++;
             }
             SetGlyphsToSpriteAsset(_actionTextureBuffer, _actionTextureIndexes);
 
