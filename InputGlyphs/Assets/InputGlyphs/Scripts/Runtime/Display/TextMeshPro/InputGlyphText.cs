@@ -14,8 +14,6 @@ namespace InputGlyphs.Display
 {
     public class InputGlyphText : MonoBehaviour
     {
-        public static int PackedTextureSize = 2048;
-
         [SerializeField]
         public TMP_Text Text = null;
 
@@ -192,33 +190,41 @@ namespace InputGlyphs.Display
                     Debug.LogWarning("InputActionReference is not set.", this);
                     return;
                 }
+                
+                Texture2D texture;
+                var textureIndex = assignedTextureCount;
+                if (textureIndex < _actionTextureBuffer.Count)
+                {
+                    texture = _actionTextureBuffer[textureIndex];
+                }
+                else
+                {
+                    texture = new Texture2D(2, 2);
+                    _actionTextureBuffer.Add(texture);
+                }
 
                 var playerInputAction = playerInput.actions.FindAction(actionReference.action.id);
-                if (InputLayoutPathUtility.TryGetActionBindingPath(playerInputAction, PlayerInput.currentControlScheme, _pathBuffer))
+                if (InputLayoutPathUtility.TryGetActionBindingPath(playerInputAction, PlayerInput.currentControlScheme, _pathBuffer)
+                    && DisplayGlyphTextureGenerator.GenerateGlyphTexture(texture, devices, _pathBuffer, GlyphsLayoutData))
                 {
-                    Texture2D texture;
-                    var textureIndex = assignedTextureCount;
-                    if (textureIndex < _actionTextureBuffer.Count)
-                    {
-                        texture = _actionTextureBuffer[textureIndex];
-                    }
-                    else
-                    {
-                        texture = new Texture2D(2, 2);
-                        _actionTextureBuffer.Add(texture);
-                    }
-                    
-                    if (DisplayGlyphTextureGenerator.GenerateGlyphTexture(texture, devices, _pathBuffer, GlyphsLayoutData))
-                    {
-                        _actionTextureIndexes.Add(Tuple.Create(playerInputAction.name, textureIndex));
-                    }
-                    
-                    assignedTextureCount++;
+                    // Glyph texture generation succeeded; the texture is updated in place.
                 }
+                else
+                {
+                    HandleGlyphTextureGenerationFailed(texture);
+                }
+                
+                _actionTextureIndexes.Add(Tuple.Create(playerInputAction.name, textureIndex));
+                assignedTextureCount++;
             }
             SetGlyphsToSpriteAsset(_actionTextureBuffer, _actionTextureIndexes);
 
             Profiler.EndSample();
+        }
+        
+        protected virtual void HandleGlyphTextureGenerationFailed(Texture2D texture)
+        {
+            texture.Reinitialize(8, 8);
         }
 
         private void SetGlyphsToSpriteAsset(IReadOnlyList<Texture2D> actionTextures, IReadOnlyList<Tuple<string, int>> actionTextureIndexes)

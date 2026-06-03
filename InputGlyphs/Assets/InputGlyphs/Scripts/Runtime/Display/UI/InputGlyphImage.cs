@@ -175,15 +175,25 @@ namespace InputGlyphs.Display
             }
 
             var playerInputAction = playerInput.actions.FindAction(InputActionReference.action.id);
-            if (InputLayoutPathUtility.TryGetActionBindingPath(playerInputAction, PlayerInput.currentControlScheme, _pathBuffer))
+            if (InputLayoutPathUtility.TryGetActionBindingPath(playerInputAction, PlayerInput.currentControlScheme, _pathBuffer)
+                && DisplayGlyphTextureGenerator.GenerateGlyphTexture(_texture, devices, _pathBuffer, GlyphsLayoutData))
             {
-                if (DisplayGlyphTextureGenerator.GenerateGlyphTexture(_texture, devices, _pathBuffer, GlyphsLayoutData))
-                {
-                    Destroy(_createdSprite);
-                    _createdSprite = Sprite.Create(_texture, new Rect(0, 0, _texture.width, _texture.height), new Vector2(0.5f, 0.5f), Mathf.Min(_texture.width, _texture.height));
-                    Image.sprite = _createdSprite;
-                }
+                Destroy(_createdSprite);
+                _createdSprite = Sprite.Create(_texture, new Rect(0, 0, _texture.width, _texture.height), new Vector2(0.5f, 0.5f), Mathf.Min(_texture.width, _texture.height));
+                Image.sprite = _createdSprite;
             }
+            else
+            {
+                HandleGlyphTextureGenerationFailed();
+            }
+        }
+
+        protected virtual void HandleGlyphTextureGenerationFailed()
+        {
+            _texture.Reinitialize(8, 8);
+            Destroy(_createdSprite);
+            _createdSprite = Sprite.Create(_texture, new Rect(0, 0, _texture.width, _texture.height), new Vector2(0.5f, 0.5f), Mathf.Min(_texture.width, _texture.height));
+            Image.sprite = _createdSprite;
         }
 
         //
