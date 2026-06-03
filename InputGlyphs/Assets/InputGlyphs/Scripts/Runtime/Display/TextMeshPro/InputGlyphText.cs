@@ -203,17 +203,15 @@ namespace InputGlyphs.Display
                     _actionTextureBuffer.Add(texture);
                 }
 
-                var hasGeneratedGlyphTexture = false;
                 var playerInputAction = playerInput.actions.FindAction(actionReference.action.id);
-                if (InputLayoutPathUtility.TryGetActionBindingPath(playerInputAction, PlayerInput.currentControlScheme, _pathBuffer))
+                if (InputLayoutPathUtility.TryGetActionBindingPath(playerInputAction, PlayerInput.currentControlScheme, _pathBuffer)
+                    && DisplayGlyphTextureGenerator.GenerateGlyphTexture(texture, devices, _pathBuffer, GlyphsLayoutData))
                 {
-                    hasGeneratedGlyphTexture = DisplayGlyphTextureGenerator.GenerateGlyphTexture(texture, devices, _pathBuffer, GlyphsLayoutData);
+                    // Glyph texture generation succeeded; the texture is updated in place.
                 }
-
-                // fallback
-                if (!hasGeneratedGlyphTexture)
+                else
                 {
-                    texture.Reinitialize(8, 8);
+                    HandleGlyphTextureGenerationFailed(texture);
                 }
                 
                 _actionTextureIndexes.Add(Tuple.Create(playerInputAction.name, textureIndex));
@@ -222,6 +220,11 @@ namespace InputGlyphs.Display
             SetGlyphsToSpriteAsset(_actionTextureBuffer, _actionTextureIndexes);
 
             Profiler.EndSample();
+        }
+        
+        protected virtual void HandleGlyphTextureGenerationFailed(Texture2D texture)
+        {
+            texture.Reinitialize(8, 8);
         }
 
         private void SetGlyphsToSpriteAsset(IReadOnlyList<Texture2D> actionTextures, IReadOnlyList<Tuple<string, int>> actionTextureIndexes)
