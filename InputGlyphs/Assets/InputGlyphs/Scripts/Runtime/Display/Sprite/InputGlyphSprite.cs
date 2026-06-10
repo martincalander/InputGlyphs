@@ -88,6 +88,8 @@ namespace InputGlyphs.Display
             UpdateGlyphs(PlayerInput);
         }
         
+        private readonly List<InputDevice>  _deviceBuffer = new();
+        
         private void UpdateGlyphs(PlayerInput playerInput)
         {
             if (InputActionReference == null || InputActionReference.action == null)
@@ -96,22 +98,30 @@ namespace InputGlyphs.Display
                 return;
             }
             
-            IReadOnlyList<InputDevice> devices;
+            _deviceBuffer.Clear();
             string controlScheme;
             if (string.IsNullOrEmpty(ControlScheme))
             {
-                devices = playerInput.devices;
-                controlScheme = playerInput.currentControlScheme;
+                if (playerInput == null)
+                {
+                    _deviceBuffer.Clear();
+                    controlScheme = string.Empty;
+                }
+                else
+                {
+                    _deviceBuffer.AddRange(playerInput.devices);
+                    controlScheme = playerInput.currentControlScheme;
+                }
             }
             else
             {
-                devices = DisplayUtils.CollectDevicesForControlScheme(InputActionReference.action.actionMap.controlSchemes.FirstOrDefault(v => v.name == ControlScheme), playerInput);
+                DisplayUtils.CollectDevicesForControlScheme(InputActionReference.action.actionMap.controlSchemes.FirstOrDefault(v => v.name == ControlScheme), _deviceBuffer, playerInput);
                 controlScheme = ControlScheme;
             }
 
             var playerInputAction = playerInput?.actions.FindAction(InputActionReference.action.id) ?? InputActionReference.action;
             if (InputLayoutPathUtility.TryGetActionBindingPath(playerInputAction, controlScheme, _pathBuffer)
-                && DisplayGlyphTextureGenerator.GenerateGlyphTexture(_texture, devices, _pathBuffer, GlyphsLayoutData))
+                && DisplayGlyphTextureGenerator.GenerateGlyphTexture(_texture, _deviceBuffer, _pathBuffer, GlyphsLayoutData))
             {
                 Destroy(_createdSprite);
                 _createdSprite = Sprite.Create(_texture, new Rect(0, 0, _texture.width, _texture.height), new Vector2(0.5f, 0.5f), Mathf.Min(_texture.width, _texture.height));

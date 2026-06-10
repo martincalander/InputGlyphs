@@ -109,6 +109,8 @@ namespace InputGlyphs.Display
             UpdateGlyphs(PlayerInput);
         }
 
+        private readonly List<InputDevice> _deviceBuffer = new();
+
         private void UpdateGlyphs(PlayerInput playerInput)
         {
             Profiler.BeginSample("UpdateGlyphs");
@@ -136,22 +138,30 @@ namespace InputGlyphs.Display
                     _actionTextureBuffer.Add(texture);
                 }
 
-                IReadOnlyList<InputDevice> devices;
+                _deviceBuffer.Clear();
                 string controlScheme;
                 if (string.IsNullOrEmpty(ControlScheme))
                 {
-                    devices = playerInput?.devices ?? Array.Empty<InputDevice>();
-                    controlScheme = playerInput?.currentControlScheme ?? string.Empty;
+                    if (playerInput == null)
+                    {
+                        _deviceBuffer.Clear();
+                        controlScheme = string.Empty;
+                    }
+                    else
+                    {
+                        _deviceBuffer.AddRange(playerInput.devices);
+                        controlScheme = playerInput.currentControlScheme;
+                    }
                 }
                 else
                 {
-                    devices = DisplayUtils.CollectDevicesForControlScheme(actionReference.action.actionMap.controlSchemes.FirstOrDefault(v => v.name == ControlScheme), playerInput);
+                    DisplayUtils.CollectDevicesForControlScheme(actionReference.action.actionMap.controlSchemes.FirstOrDefault(v => v.name == ControlScheme), _deviceBuffer, playerInput);
                     controlScheme = ControlScheme;
                 }
 
                 var playerInputAction = playerInput?.actions.FindAction(actionReference.action.id) ?? actionReference.action;
                 if (InputLayoutPathUtility.TryGetActionBindingPath(playerInputAction, controlScheme, _pathBuffer)
-                    && DisplayGlyphTextureGenerator.GenerateGlyphTexture(texture, devices, _pathBuffer, GlyphsLayoutData))
+                    && DisplayGlyphTextureGenerator.GenerateGlyphTexture(texture, _deviceBuffer, _pathBuffer, GlyphsLayoutData))
                 {
                     // Glyph texture generation succeeded; the texture is updated in place.
                 }
