@@ -7,19 +7,36 @@ namespace InputGlyphs.Display
     {
         public static bool CollectDevicesForControlScheme(InputControlScheme controlScheme, List<InputDevice> results, PlayerInput playerInput = null)
         {
-            var pickResult = playerInput != null ? controlScheme.PickDevicesFrom(playerInput.devices) : default;
-            if (!pickResult.isSuccessfulMatch)
+            if (playerInput != null)
             {
-                pickResult = controlScheme.PickDevicesFrom(InputSystem.devices);
+                using (var pickResult = controlScheme.PickDevicesFrom(playerInput.devices))
+                {
+                    if (pickResult.isSuccessfulMatch)
+                    {
+                        foreach (var device in pickResult.devices)
+                        {
+                            results.Add(device);
+                        }
+                        
+                        return true;
+                    }
+                }
+            }
+            
+            using (var pickResult = controlScheme.PickDevicesFrom(InputSystem.devices))
+            {
+                if (pickResult.isSuccessfulMatch)
+                {
+                    foreach (var device in pickResult.devices)
+                    {
+                        results.Add(device);
+                    }
+                    
+                    return true;
+                }
             }
 
-            foreach (var device in pickResult.devices)
-            {
-                results.Add(device);
-            }
-
-            return pickResult.isSuccessfulMatch;
-            ;
+            return false;
         }
     }
 }

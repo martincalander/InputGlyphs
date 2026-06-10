@@ -48,7 +48,6 @@ namespace InputGlyphs.Display
                 SpriteRenderer = GetComponent<SpriteRenderer>();
             }
             _texture = new Texture2D(2, 2);
-            _playerInputChangeDetector.ControlsChanged += UpdateGlyphs;
         }
 
         protected virtual void Start()
@@ -56,9 +55,15 @@ namespace InputGlyphs.Display
             UpdateGlyphs(PlayerInput);
         }
         
+        protected virtual void OnEnable()
+        {
+            _playerInputChangeDetector.ControlsChanged += UpdateGlyphs;
+        }
+
         protected virtual void OnDisable()
         {
             _playerInputChangeDetector.OnDisable();
+            _playerInputChangeDetector.ControlsChanged -= UpdateGlyphs;
         }
 
         protected virtual void OnDestroy()

@@ -54,7 +54,6 @@ namespace InputGlyphs.Display
             }
             _defaultSizeDelta = Image.rectTransform.sizeDelta;
             _texture = new Texture2D(2, 2);
-            _playerInputChangeDetector.ControlsChanged += UpdateGlyphs;
         }
 
         protected override void Start()
@@ -62,11 +61,18 @@ namespace InputGlyphs.Display
             base.Start();
             UpdateGlyphs(PlayerInput);
         }
+        
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            _playerInputChangeDetector.ControlsChanged += UpdateGlyphs;
+        }
 
         protected override void OnDisable()
         {
             base.OnDisable();
             _playerInputChangeDetector.OnDisable();
+            _playerInputChangeDetector.ControlsChanged -= UpdateGlyphs;
         }
 
         protected override void OnDestroy()

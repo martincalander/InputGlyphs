@@ -66,7 +66,6 @@ namespace InputGlyphs.Display
             _sharedSpriteAsset.material = _sharedMaterial;
             _sharedSpriteAsset.spriteSheet = _packedTexture;
             Text.spriteAsset = _sharedSpriteAsset;
-            _playerInputChangeDetector.ControlsChanged += UpdateGlyphs;
         }
 
         protected void Start()
@@ -74,9 +73,15 @@ namespace InputGlyphs.Display
             UpdateGlyphs(PlayerInput);
         }
 
+        protected virtual void OnEnable()
+        {
+            _playerInputChangeDetector.ControlsChanged += UpdateGlyphs;
+        }
+
         protected virtual void OnDisable()
         {
             _playerInputChangeDetector.OnDisable();
+            _playerInputChangeDetector.ControlsChanged -= UpdateGlyphs;
         }
 
         protected virtual void OnDestroy()
