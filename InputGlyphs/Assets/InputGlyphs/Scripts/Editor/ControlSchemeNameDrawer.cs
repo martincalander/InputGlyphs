@@ -85,6 +85,17 @@ namespace InputGlyphs.Editor
                     return;
                 }
             }
+
+            var inputActionArrayField = type.GetFields(bindingFlags).FirstOrDefault(f => f.FieldType == typeof(InputActionReference[]));
+            if (inputActionArrayField != null)
+            {
+                var inputActionReferenceArray = (InputActionReference[])inputActionArrayField.GetValue(target);
+                if (inputActionReferenceArray != null && inputActionReferenceArray.Length > 0 && inputActionReferenceArray[0] != null)
+                {
+                    results.AddRange(inputActionReferenceArray[0].action.actionMap.controlSchemes.Select(v => v.name));
+                    return;
+                }
+            }
         }
     }
 }
