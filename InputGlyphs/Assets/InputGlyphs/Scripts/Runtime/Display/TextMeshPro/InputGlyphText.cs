@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using InputGlyphs.Attributes;
 using InputGlyphs.Utils;
 using TMPro;
 using UnityEngine;
@@ -29,7 +30,7 @@ namespace InputGlyphs.Display
         [SerializeField]
         public GlyphsLayoutData GlyphsLayoutData = GlyphsLayoutData.Default;
 
-        [SerializeField]
+        [SerializeField, ControlSchemeName]
         public string ControlScheme;
 
         private readonly PlayerInputChangeDetector _playerInputChangeDetector = new ();

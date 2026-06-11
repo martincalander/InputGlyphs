@@ -1,6 +1,7 @@
 #if INPUT_SYSTEM && ENABLE_INPUT_SYSTEM
 using System.Collections.Generic;
 using System.Linq;
+using InputGlyphs.Attributes;
 using InputGlyphs.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -23,7 +24,7 @@ namespace InputGlyphs.Display
         [SerializeField]
         public GlyphsLayoutData GlyphsLayoutData = GlyphsLayoutData.Default;
         
-        [SerializeField]
+        [SerializeField, ControlSchemeName]
         public string ControlScheme;
 
         private readonly PlayerInputChangeDetector _playerInputChangeDetector = new ();
