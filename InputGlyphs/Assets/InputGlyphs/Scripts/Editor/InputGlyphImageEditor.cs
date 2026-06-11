@@ -4,7 +4,7 @@ using UnityEditor;
 
 namespace InputGlyphs.Display.Editor
 {
-    [CustomEditor(typeof(InputGlyphImage)), CanEditMultipleObjects]
+    [CustomEditor(typeof(InputGlyphImage), editorForChildClasses: true), CanEditMultipleObjects]
     public class InputGlyphImageEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
