@@ -12,7 +12,7 @@ namespace InputGlyphs.Editor
     public class ControlSchemeNameDrawer : PropertyDrawer
     {
         private readonly List<string> _options = new ();
-        private const string BlankMessage = "<AUTO>";
+        private const string BlankMessage = "<Follow PlayerInput>";
         
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
