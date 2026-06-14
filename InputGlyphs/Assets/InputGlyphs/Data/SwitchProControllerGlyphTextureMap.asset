@@ -25,6 +25,10 @@ MonoBehaviour:
     GlyphTexture: {fileID: 2800000, guid: cd309e4dd3c5f5f4693ec2916ea12980, type: 3}
   - InputLayoutLocalPath: dpad
     GlyphTexture: {fileID: 2800000, guid: 730d757c63a024a4d97389d9d2a2da30, type: 3}
+  - InputLayoutLocalPath: dpad/x
+    GlyphTexture: {fileID: 2800000, guid: 7df4277053828d94eb39adfb9db0f5d8, type: 3}
+  - InputLayoutLocalPath: dpad/y
+    GlyphTexture: {fileID: 2800000, guid: 42c242bce62d8fd4da978bcb252f4107, type: 3}
   - InputLayoutLocalPath: dpad/up
     GlyphTexture: {fileID: 2800000, guid: e280a276ece76e24e88a6584ade0390f, type: 3}
   - InputLayoutLocalPath: dpad/down
