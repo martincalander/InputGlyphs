@@ -4,6 +4,7 @@
     "version": "1.3.0",
     "unity": "2022.3",
     "description": "Displays glyphs (icons) of keyboard & mouse or controller buttons recognized by Unity's InputSystem.",
+    "icon": "InputGlyphsIcon.png",
     "author": {
         "name": "DAIKI(eviltwo)",
         "url": "https://github.com/eviltwo"
